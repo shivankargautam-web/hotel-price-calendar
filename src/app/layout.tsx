@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Shivankar" }],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-IN" className={`${display.variable} ${sans.variable}`}>
       <body>{children}</body>
