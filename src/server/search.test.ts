@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_QUERY } from "@/lib/query";
+import { DEFAULT_QUERY, MAX_RESULTS, parseQuery } from "@/lib/query";
 import { addDays } from "@/lib/dates";
 import type { PriceBreakdown, SearchQuery } from "@/lib/types";
 import { DemoPriceProvider } from "./providers/demo";
@@ -174,5 +174,21 @@ describe("runSearch with demo data", () => {
     expect(three.results.items[0].nights).toBe(3);
     expect(three.results.items[0].checkOut).toBe(addDays(three.results.items[0].checkIn, 3));
     expect(three.calendar.map((c) => c.best?.total)).not.toEqual(two.calendar.map((c) => c.best?.total));
+  });
+});
+
+describe("result paging", () => {
+  it("can page through every demo match, beyond 500", async () => {
+    const demo = new DemoPriceProvider(() => NOW);
+    const { query, errors } = parseQuery(new URLSearchParams({ limit: String(MAX_RESULTS) }));
+    expect(errors).toEqual([]);
+    const res = await runSearch(query, demo, NOW);
+    expect(res.results.total).toBeGreaterThan(500);
+    expect(res.results.items).toHaveLength(res.results.total);
+  });
+
+  it("accepts a limit past 500 as sent by Show more", () => {
+    expect(parseQuery(new URLSearchParams({ limit: "530" })).errors).toEqual([]);
+    expect(parseQuery(new URLSearchParams({ limit: String(MAX_RESULTS + 1) })).errors).not.toEqual([]);
   });
 });

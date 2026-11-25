@@ -14,5 +14,7 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["./test/setup.ts"],
+    // UI tests run the real demo search (16+ hotels × 365 full-stay quotes) and can be slow on shared runners.
+    testTimeout: 20_000,
   },
 });

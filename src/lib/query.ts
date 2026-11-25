@@ -1,4 +1,4 @@
-import { DEFAULT_TARGET, getHotel, resolveTarget } from "./catalogue";
+import { DEFAULT_TARGET, HOTELS, getHotel, resolveTarget } from "./catalogue";
 import { isValidIsoDate } from "./dates";
 import type { SearchQuery } from "./types";
 
@@ -7,6 +7,9 @@ export const MAX_ROOMS = 4;
 export const MAX_ADULTS_PER_ROOM = 3;
 export const MAX_CHILDREN_PER_ROOM = 2;
 export const MAX_BUDGET = 10_000_000;
+/** Enough to list every hotel × check-in date in the rolling year. */
+export const MAX_RESULTS = HOTELS.length * 366;
+export const RESULTS_PAGE_SIZE = 30;
 
 export const DEFAULT_QUERY: SearchQuery = {
   target: DEFAULT_TARGET,
@@ -21,7 +24,7 @@ export const DEFAULT_QUERY: SearchQuery = {
   month: null,
   date: null,
   sort: "total",
-  limit: 30,
+  limit: RESULTS_PAGE_SIZE,
 };
 
 function int(value: string | null): number | undefined {
@@ -59,7 +62,7 @@ export function parseQuery(params: URLSearchParams): { query: SearchQuery; error
   q.adults = read("adults", 1, MAX_ROOMS * MAX_ADULTS_PER_ROOM) ?? q.adults;
   q.children = read("children", 0, MAX_ROOMS * MAX_CHILDREN_PER_ROOM) ?? q.children;
   q.budget = read("budget", 1, MAX_BUDGET) ?? q.budget;
-  q.limit = read("limit", 1, 500) ?? q.limit;
+  q.limit = read("limit", 1, MAX_RESULTS) ?? q.limit;
 
   if (q.adults < q.rooms) errors.push("Each room needs at least one adult");
   if (q.adults > q.rooms * MAX_ADULTS_PER_ROOM) errors.push(`At most ${MAX_ADULTS_PER_ROOM} adults per room`);
