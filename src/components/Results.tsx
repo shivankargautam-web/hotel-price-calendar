@@ -4,6 +4,7 @@ import { useState } from "react";
 import { evaluateBudget } from "@/lib/budget";
 import { formatDate, formatMonth, formatRelative } from "@/lib/dates";
 import { formatINR } from "@/lib/money";
+import { MAX_RESULTS, RESULTS_PAGE_SIZE } from "@/lib/query";
 import type { RankedStay, SearchQuery, SearchResponse } from "@/lib/types";
 import { refreshQuote, type RefreshResult } from "./api";
 
@@ -284,7 +285,7 @@ export function Results({
         </ol>
       )}
       {results.kind !== "closest" && results.total > results.items.length && (
-        <button type="button" className="button button-ghost show-more" onClick={() => onChange({ limit: query.limit + 30 })}>
+        <button type="button" className="button button-ghost show-more" onClick={() => onChange({ limit: Math.min(query.limit + RESULTS_PAGE_SIZE, MAX_RESULTS) })}>
           Show more ({results.total - results.items.length} remaining)
         </button>
       )}
